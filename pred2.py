@@ -63,7 +63,7 @@ def detect_face(image, input_file, select_name):
                 cv2.imwrite('static/dst/opencv_face_detect_rectangle1.jpg', result_image)
                 return predict_name, predict_enname, rate
             else:
-              　# 選択した人物が見つからない場合の処理
+                # 選択した人物が見つからない場合の処理
                 predict_name = None
             a -= 1
 
