@@ -145,5 +145,5 @@ def start_detect(input_file, select_name):
 
 
 if __name__ == '__main__':
-    predict_name, predict_enname, rate = start_detect(input_file, )
+    predict_name, predict_enname, rate = start_detect(input_file, select_name)
     print(predict_name + ':' + predict_enname + ':' + rate)
