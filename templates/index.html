@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>逃げ恥メンバー顔識別</title>
+</head>
+<body>
+    <h1>
+        画像をアップロードしてください
+    </h1>
+    <form method = post enctype = multipart/form-data>
+    <!-- ドロップダウンリストの作成 -->
+    <select name = "select_name">
+        <option value=0>新垣結衣</option>
+        <option value=1>星野源</option>
+        <option value=2>真野恵里菜</option>
+        <option value=3>藤井隆</option>
+        <option value=4>石田ゆり子</option>
+        <option value=5>成田凌</option>
+        <option value=6>古田新太</option>
+        <option value=7>大谷亮平</option>
+        <option value=8>宇梶剛士</option>
+        <option value=9>冨田靖子</option>
+        <option value=10>山賀琴子</option>
+        <option value=11>古舘寛治</option>
+    </select>
+    <!-- ファイル選択 -->
+    <p><input type = file name = file>
+    <!-- 送信ボタン -->
+    <input type = submit value = Upload>
+    </form>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class=flashes>
+      <!-- message when sending -->
+      {% for category, message in messages %}
+      <div class="{{ category }}" >{{ message }}</div>
+      {% endfor %}
+      {% if dst_img %}
+      <!-- 判定後の画像表示 -->
+      <img src={{url_for('static', filename=dst_img)}} class="img-fluid" alt="Responsive image">
+      {% endif %}
+    </div>
+    {% endif %}
+    {% endwith %}
+</body>
+</html>
