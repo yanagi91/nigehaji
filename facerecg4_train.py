@@ -41,31 +41,40 @@ def train():
 
     #画像データ(.npy)を読み込み
     X_train, X_test, y_train, y_test = np.load(fic.NPY_FILENAME)
-    X_train = X_train.astype("float") / 256
-    X_test = X_test.astype("float") / 256
+    X_train = X_train.astype("float") / 255
+    X_test = X_test.astype("float") / 255
     y_train = np_utils.to_categorical(y_train, fic.NB_CLASSES)
     y_test = np_utils.to_categorical(y_test, fic.NB_CLASSES)
-
+    
+    # 入力層の設定
     input_tensor = Input(shape=(fic.IMAGE_SIZE, fic.IMAGE_SIZE, 3))
+    
+    # vgg16の読み込み
     vgg16 = VGG16(include_top=False, weights='imagenet', input_tensor=input_tensor)
 
+    # 結合層の変更
     top_model = Sequential()
     top_model.add(Flatten(input_shape=vgg16.output_shape[1:]))
     top_model.add(Dense(256, activation='relu'))
     top_model.add(Dropout(0.5))
     top_model.add(Dense(fic.NB_CLASSES, activation='softmax'))
-
+    
+    # 変更した部分をvgg16と接続
     vgg_model = Model(inputs=vgg16.input, outputs=top_model(vgg16.output))
 
+    # vgg16の14層目までのパラメーターの変更を行わないための処理
     for layer in vgg_model.layers[:15]:
         layer.trainable = False
-
+    
+    # パラメーター更新の設定
     vgg_model.compile(loss='categorical_crossentropy',
         optimizer=optimizers.SGD(lr=1e-3, momentum=0.9),
         metrics=['accuracy'])
 
+    # 学習の実行
     history = vgg_model.fit(X_train, y_train, batch_size=8,epochs=10)
 
+    # 学習結果のテストの実行
     score = vgg_model.evaluate(X_test, y_test)
     print('loss=', score[0])
     print('accuracy=', score[1])
