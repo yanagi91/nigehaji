@@ -9,18 +9,6 @@ import facerecg_image_comn as fic
 X = []  # 画像データ
 Y = []  # ラベルデータ
 
-# データをリストに追加
-def data_append(data, cat):
-    X.append(data)
-    Y.append(cat)
-
-# ファイルごとにループ、add_sampleでサンプルに登録
-def make_sample(files, is_train):
-    global X, Y
-    X = []; Y = []
-    for cat, fname in files:
-        add_sample(cat, fname, is_train)
-    return np.array(X), np.array(Y)
 
 def arg_parse():
     parser = argparse.ArgumentParser(description='image increase.')
@@ -29,6 +17,7 @@ def arg_parse():
     parser.add_argument('-o', '--outdir', default='./increased',
                         type=str, help='output directory path')
     return parser.parse_args()
+
 
 def main(args):
     allfiles = []
@@ -44,6 +33,7 @@ def main(args):
                 os.mkdir(os.path.join(args.outdir, cat))
                 print('outdir:' + os.path.join(args.outdir, cat))
             images.allmodi(fn, os.path.join(args.outdir, cat))
+            
 
 if __name__ == '__main__':
     args = arg_parse()
