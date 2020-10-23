@@ -8,6 +8,7 @@ from keras.models import load_model
 
 
 input_file = 'test/sample10.jpg'
+select_name = '新垣結衣'
 
 
 def detect_face(image, input_file, select_name):
@@ -49,37 +50,40 @@ def detect_face(image, input_file, select_name):
             print(face_info[a][2:4])
             img = cv2.resize(predict_img,(128, 128))
             img = np.expand_dims(img,axis=0)
-            idx, predict_name, predict_enname, rate = detect_who(img)
+            idx, predict_name, predict_enname, rate = detect_who(img) # 抜き出した顔の判定
             if int(select_name) == int(idx):
                 result_image = cv2.imread(input_file)
+                # 顔座標の取得
                 x = int(face_info[a][4])
                 y = int(face_info[a][5])
                 h = int(face_info[a][6])
+                # 顔のある場所を四角で囲う
                 cv2.rectangle(result_image, (x, y), (x+h, y+h),(255, 0, 0), 2)
+                # 画像の保存
                 cv2.imwrite('static/dst/opencv_face_detect_rectangle1.jpg', result_image)
                 return predict_name, predict_enname, rate
             else:
+              　# 選択した人物が見つからない場合の処理
                 predict_name = None
             a -= 1
 
         return predict_name, predict_enname, rate
-    #顔が検出されなかった時
+    # 顔が検出されなかった時
     else:
         print("no face")
         return None, None, None
 
 
 def detect_who(img):
-    #予測
+    # 予測
     name=""
     model = load_model('vgg_model_nigehaji.h5')
 
-    # nameNumLabel=np.argmax(model.predict(img))
     predict = model.predict(img)
     for i, pre in enumerate(predict):
-        idx = np.argmax(pre)
-        rate = pre[idx] * 100
-        rate = str(round(rate, 1))
+        idx = np.argmax(pre) # 確率の一番高いインデックスの検索
+        rate = pre[idx] * 100 # '%'への変換
+        rate = str(round(rate, 1)) # 少数第一位まで
         if idx == 0:
             name="新垣結衣"
             en_name="Aragaki Yui"
@@ -125,21 +129,21 @@ def start_detect(input_file, select_name):
     img_file = input_file
     model = load_model('vgg_model_nigehaji.h5')
 
-    image = cv2.imread(img_file)
+    image = cv2.imread(img_file) # 画像データの読み込み
     print(img_file)
+    # 画像が読み込めなかった時の処理
     if image is None:
         print("Not open:")
+        
+    # 色データの並び替え
     b,g,r = cv2.split(image)
     image = cv2.merge([r,g,b])
+    
+    # 画像データからの判定処理 predict_name(名前), predict_enname(name), rate(本人の確率)
     predict_name, predict_enname, rate = detect_face(image, input_file, select_name)
-    # whoImage=detect_face(image)
-    #
-    # plt.imshow(whoImage)
-    # plt.show()
-
     return predict_name, predict_enname, rate
 
 
 if __name__ == '__main__':
-    predict_name, predict_enname, rate = start_detect(input_file)
+    predict_name, predict_enname, rate = start_detect(input_file, )
     print(predict_name + ':' + predict_enname + ':' + rate)
