@@ -17,7 +17,7 @@ def override_url_for():
     return dict(url_for=dated_url_for)
 
 def dated_url_for(endpoint, **values):
-    # 判定後の画像を上書きしているため画像を更新する処理
+    # 判定後の画像の保存を上書きしているためhtmlの画像を更新する処理
     if endpoint == 'static':
         filename = values.get('filename', None)
         if filename:
@@ -57,7 +57,7 @@ def uploads_file():
 
         select_name = request.form['select_name']
         #print(select_name)
-        file_address = 'static/uploads/{}'.format(filename) # 判定画像アドレス
+        file_address = 'static/uploads/{}'.format(filename) # 判定する画像のアドレス
         
         predict_name, predict_enname, rate = start_detect(file_address, select_name) # 画像判定
 

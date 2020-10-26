@@ -34,7 +34,6 @@ def detect_face(image, input_file, select_name):
             face_size = width * height
             img = image[y:y + height, x:x + width]
             face_info.append([face_size, img, rect[0:2], rect[2:4], x, y, height])
-            a += 1
             # x,y,width,height=rect
 
             # img = image[rect[1]:rect[1]+rect[3],rect[0]:rect[0]+rect[2]]
@@ -44,8 +43,8 @@ def detect_face(image, input_file, select_name):
         #print(face_info)
         face_info.sort(reverse = True, key=itemgetter(0))
         #print('re:' + str(face_info))
-        a -= 1
-        for x, y, w, h in face_list:
+        
+        for a in range(len(face_list)):
             predict_img = face_info[a][1]
             print(face_info[a][2:4])
             img = cv2.resize(predict_img,(128, 128))
@@ -63,9 +62,8 @@ def detect_face(image, input_file, select_name):
                 cv2.imwrite('static/dst/opencv_face_detect_rectangle1.jpg', result_image)
                 return predict_name, predict_enname, rate
             else:
-              　# 選択した人物が見つからない場合の処理
+                # 選択した人物が見つからない場合の処理
                 predict_name = None
-            a -= 1
 
         return predict_name, predict_enname, rate
     # 顔が検出されなかった時
@@ -85,8 +83,8 @@ def detect_who(img):
         rate = pre[idx] * 100 # '%'への変換
         rate = str(round(rate, 1)) # 少数第一位まで
         if idx == 0:
-            name="新垣結衣"
-            en_name="Aragaki Yui"
+            name = "新垣結衣"
+            en_name = "Aragaki Yui"
         elif idx == 1:
             name = "星野源"
             en_name = "Hoshino Gen"
@@ -145,5 +143,5 @@ def start_detect(input_file, select_name):
 
 
 if __name__ == '__main__':
-    predict_name, predict_enname, rate = start_detect(input_file, )
+    predict_name, predict_enname, rate = start_detect(input_file, select_name)
     print(predict_name + ':' + predict_enname + ':' + rate)
