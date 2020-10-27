@@ -16,16 +16,17 @@ def detect_face(image, input_file, select_name):
     #opencvを使って顔抽出
     # image_gs = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    ##ローカルの場合(/usr/local/opt/opencv/share/OpenCV/haarcascades/haarcascade_frontalface_alt.xml)
-    cascade = cv2.CascadeClassifier("haarcascade_frontalface_alt.xml")
     # 顔認識の実行
+    cascade = cv2.CascadeClassifier("haarcascade_frontalface_alt.xml")
     face_list=cascade.detectMultiScale(image, minNeighbors=3, minSize=(30,30))
+
     face = []
     #顔が１つ以上検出された時
     if len(face_list) > 0:
         face_info = []
         a = 0
         for rect in face_list:
+            # 顔座標の取得
             x = rect[0]
             y = rect[1]
             width = rect[2]
@@ -33,6 +34,7 @@ def detect_face(image, input_file, select_name):
             face.append([x,y,width,height])
             face_size = width * height
             img = image[y:y + height, x:x + width]
+            # 顔の情報をリストに保存
             face_info.append([face_size, img, rect[0:2], rect[2:4], x, y, height])
             # x,y,width,height=rect
 
@@ -44,18 +46,27 @@ def detect_face(image, input_file, select_name):
         face_info.sort(reverse = True, key=itemgetter(0))
         #print('re:' + str(face_info))
         
+        # それぞれの顔の判定
         for a in range(len(face_list)):
+            # 顔の情報をリストから抜き出す
             predict_img = face_info[a][1]
             print(face_info[a][2:4])
             img = cv2.resize(predict_img,(128, 128))
             img = np.expand_dims(img,axis=0)
+
             idx, predict_name, predict_enname, rate = detect_who(img) # 抜き出した顔の判定
+
+            # 選択した人物か判定
             if int(select_name) == int(idx):
+                # 選択した人物の時の処理
+                # 元画像の読み込み
                 result_image = cv2.imread(input_file)
+
                 # 顔座標の取得
                 x = int(face_info[a][4])
                 y = int(face_info[a][5])
                 h = int(face_info[a][6])
+
                 # 顔のある場所を四角で囲う
                 cv2.rectangle(result_image, (x, y), (x+h, y+h),(255, 0, 0), 2)
                 # 画像の保存
@@ -64,19 +75,20 @@ def detect_face(image, input_file, select_name):
             else:
                 # 選択した人物が見つからない場合の処理
                 predict_name = None
-
         return predict_name, predict_enname, rate
-    # 顔が検出されなかった時
+    
     else:
+        # 顔が検出されなかった時
         print("no face")
         return None, None, None
 
 
 def detect_who(img):
-    # 予測
+    # 顔から人物の予測
     name=""
     model = load_model('vgg_model_nigehaji.h5')
 
+    # モデルから結果を取得
     predict = model.predict(img)
     for i, pre in enumerate(predict):
         idx = np.argmax(pre) # 確率の一番高いインデックスの検索
@@ -125,9 +137,8 @@ def detect_who(img):
 def start_detect(input_file, select_name):
     global img_file
     img_file = input_file
-    model = load_model('vgg_model_nigehaji.h5')
 
-    image = cv2.imread(img_file) # 画像データの読み込み
+    image = cv2.imread(img_file) # 元画像データの読み込み
     print(img_file)
     # 画像が読み込めなかった時の処理
     if image is None:

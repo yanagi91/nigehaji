@@ -36,16 +36,12 @@ def allwed_file(filename):
 @app.route('/', methods=['GET', 'POST'])
 def uploads_file():
     if request.method == 'POST':
-        
-        # ファイルでないものが入力されたときの処理
+        # ファイルのチェック
         if 'file' not in request.files:
             flash('ファイルがありません', 'error')
             return redirect('/')
-
         file = request.files['file']
         print(file)
-        
-        # ファイル名が入力されていないときの処理
         if file.filename == '':            
             flash('ファイルがありません', 'error')
             return redirect('/')
@@ -53,19 +49,20 @@ def uploads_file():
         # ファイルがあり拡張子が対応しているときの処理
         if file and allwed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename)) # パスを指定し画像を保存
 
-        select_name = request.form['select_name']
+        select_name = request.form['select_name'] # 選択した人物のインデックスを取得
         #print(select_name)
-        file_address = 'static/uploads/{}'.format(filename) # 判定する画像のアドレス
+        file_address = 'static/uploads/{}'.format(filename) # 保存した画像のアドレス
         
         predict_name, predict_enname, rate = start_detect(file_address, select_name) # 画像判定
 
+        # 判定後の処理
         if predict_name != None:
             # 選択した人物が画像から見つかった時の処理
             flash(predict_name, 'success')
             flash(rate + '%', 'success')
-            dst_img = 'dst/opencv_face_detect_rectangle1.jpg' # 選択した人物を四角で囲った画像
+            dst_img = 'dst/opencv_face_detect_rectangle1.jpg' # 判定後の画像のパス
             return render_template('index.html', dst_img=dst_img)
         else:
             # 選択した人物が画像から見つからなかった時の処理
